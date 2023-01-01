@@ -33,6 +33,7 @@ vault_zip_url: "https://releases.hashicorp.com/vault/{{ vault_version }}/{{ vaul
 vault_node_role: "server"
 vault_restart_handler_state: "restarted"
 vault_systemd_service_name: "vault"
+vault_service_mgr: ""
 
 # Inst - System paths.
 vault_bin_dir: "/usr/local/bin"
@@ -41,10 +42,6 @@ vault_data_dir: "/var/vault"
 vault_inst_dir: "/opt"
 vault_run_dir: "/var/run/vault"
 vault_ssl_dir: "/etc/vault.d/ssl"
-
-# Initialization and startup script templates
-vault_restart_handler_state: "restarted"
-vault_service_mgr: ""
 
 # Conf - User and group.
 vault_group: "vault"
