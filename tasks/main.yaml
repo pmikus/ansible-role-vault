@@ -127,7 +127,10 @@
     mode: 0644
   notify:
     - "Restart Vault"
+  when:
+    - vault_service_mgr == "systemd"
   tags:
     - vault-conf
 
-- meta: flush_handlers
+- name: Meta - Flush handlers
+  ansible.builtin.meta: flush_handlers
