@@ -6,14 +6,14 @@
     update_cache: true
     cache_valid_time: 3600
   when:
-    - ansible_distribution|lower == 'ubuntu'
+    - ansible_os_family == 'Debian'
   tags:
     - vault-inst-prerequisites
 
-- name: Inst - Prerequisites
+- name: Inst - Dependencies
   ansible.builtin.package:
     name: "{{ packages | flatten(levels=1) }}"
-    state: latest
+    state: "latest"
   tags:
     - vault-inst-prerequisites
 
@@ -33,13 +33,6 @@
   tags:
     - vault-conf-user
 
-- name: Inst - Clean Vault
-  ansible.builtin.file:
-    path: "{{ vault_inst_dir }}/vault"
-    state: "absent"
-  tags:
-    - vault-inst-package
-
 - name: Inst - Download Vault
   ansible.builtin.get_url:
     url: "{{ vault_zip_url }}"
@@ -47,11 +40,19 @@
   tags:
     - vault-inst-package
 
+- name: Inst - Clean Vault
+  ansible.builtin.file:
+    path: "{{ vault_inst_dir }}/vault"
+    state: "absent"
+  when:
+    - vault_force_update | bool
+  tags:
+    - vault-inst-package
+
 - name: Inst - Unarchive Vault
   ansible.builtin.unarchive:
     src: "{{ vault_inst_dir }}/{{ vault_pkg }}"
     dest: "{{ vault_inst_dir }}/"
-    creates: "{{ vault_inst_dir }}/vault"
     remote_src: true
   tags:
     - vault-inst-package
