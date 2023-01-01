@@ -4,9 +4,9 @@
 dependencies: []
 
 galaxy_info:
-  role_name: FIXME
+  role_name: vault
   author: pmikus
-  description: FIXME for Linux.
+  description: Hashicorp vault.
   company: none
   license: "license (BSD, MIT)"
   min_ansible_version: 2.9
@@ -15,5 +15,7 @@ galaxy_info:
       versions:
         - focal
         - jammy
+        - kinetic
   galaxy_tags:
-    - FIXME
+    - vault
+    - hashicorp
