@@ -73,13 +73,16 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out the codebase."
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v1"
         with:
           path: "pmikus.vault"
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: "SonarCloud Scan"
         uses: "SonarSource/sonarcloud-github-action@v1.6"
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ github.ref }}_${{ github.run_number }}
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"  # Needed to get PR information, if any
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
