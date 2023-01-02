@@ -80,9 +80,6 @@ jobs:
 
       - name: "SonarCloud Scan"
         uses: "SonarSource/sonarcloud-github-action@v1.8"
-        with:
-          args: >
-            -Dsonar.projectVersion=${{ github.ref }}_${{ github.run_number }}
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"  # Needed to get PR information, if any
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"

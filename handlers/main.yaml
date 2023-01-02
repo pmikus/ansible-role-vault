@@ -5,5 +5,5 @@
   ansible.builtin.systemd:
     daemon_reload: true
     enabled: true
-    name: "{{ vault_systemd_service_name }}"
+    name: "vault"
     state: "{{ vault_restart_handler_state }}"

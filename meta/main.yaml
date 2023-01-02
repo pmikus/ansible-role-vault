@@ -6,7 +6,7 @@ dependencies: []
 galaxy_info:
   role_name: vault
   author: pmikus
-  description: Hashicorp vault.
+  description: Hashicorp Vault.
   company: none
   license: "license (BSD, MIT)"
   min_ansible_version: 2.9
