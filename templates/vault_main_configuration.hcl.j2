@@ -66,12 +66,8 @@ listener "tcp" {
     {% include vault_storage_raft with context %}
 {% endif %}
 
-{% if vault_service_registration_consul_enable -%}
-    {% include vault_service_registration_consul_template with context %}
-{% endif %}
-
-{% if vault_ui %}
-ui = {{ vault_ui | bool | lower }}
+{% if vault_service_registration == 'consul' -%}
+    {% include vault_service_registration_consul with context %}
 {% endif %}
 
 {% if vault_telemetry_enabled | bool -%}
@@ -90,4 +86,8 @@ telemetry {
     {% endif %}
 
 }
+{% endif %}
+
+{% if vault_ui %}
+ui = {{ vault_ui | bool | lower }}
 {% endif %}

@@ -54,7 +54,6 @@ vault_datacenter: "yul1"
 vault_log_level: "info"
 vault_iface: "{{ ansible_default_ipv4.interface }}"
 vault_address: "{{ hostvars[inventory_hostname]['ansible_' + vault_iface]['ipv4']['address'] }}"
-vault_ui: true
 vault_port: 8200
 vault_use_config_path: false
 vault_main_config: "{{ vault_config_dir }}/vault_main.hcl"
@@ -87,6 +86,22 @@ vault_tcp_listeners:
     vault_tls_disable_client_certs: "{{ vault_tls_disable_client_certs }}"
     vault_disable_mlock: true
 
+# Service registration.
+vault_service_registration: "consul"
+vault_service_registration_consul: "vault_service_registration_consul.hcl.j2"
+vault_service_registration_consul_address: "127.0.0.1:8500"
+vault_service_registration_consul_check_timeout: "5s"
+vault_service_registration_consul_disable_registration: false
+vault_service_registration_consul_scheme: "http"
+vault_service_registration_consul_service: "vault"
+vault_service_registration_consul_service_tags: ""
+vault_service_registration_consul_service_address:
+vault_service_registration_consul_token:
+vault_service_registration_consul_tls_ca_file: "/etc/consul.d/ssl/ca.pem"
+vault_service_registration_consul_tls_cert_file: "/etc/consul.d/ssl/cert.pem"
+vault_service_registration_consul_tls_key_file: "/etc/consul.d/ssl/key.pem"
+vault_service_registration_consul_tls_skip_verify: false
+
 # Storage.
 vault_storage: "consul"
 vault_storage_consul: "vault_storage_consul.j2"
@@ -107,7 +122,7 @@ vault_storage_consul_path: "vault"
 vault_storage_consul_scheme: "http"
 vault_storage_consul_service: "vault"
 vault_storage_consul_service_tags: ""
-# vault_storage_consul_token: ""
+vault_storage_consul_token:
 vault_storage_consul_session_ttl: "15s"
 vault_storage_consul_lock_wait_time: "15s"
 vault_storage_consul_tls: false
@@ -116,28 +131,13 @@ vault_storage_consul_tls_cert_file: "/etc/consul.d/ssl/cert.pem"
 vault_storage_consul_tls_key_file: "/etc/consul.d/ssl/key.pem"
 vault_storage_consul_tls_skip_verify: false
 
-# Service registration.
-vault_service_registration_consul_enable: true
-vault_service_registration_consul_template: "vault_service_registration_consul.hcl.j2"
-vault_service_registration_consul_check_timeout: "5s"
-vault_service_registration_consul_address: "consul.service.consul:8500"
-vault_service_registration_consul_service: "vault"
-vault_service_registration_consul_service_tags: ""
-vault_service_registration_consul_service_address:
-vault_service_registration_consul_disable_registration: false
-vault_service_registration_consul_scheme: "http"
-
-vault_service_registration_consul_tls_config_path: "{{ vault_tls_config_path }}"
-vault_service_registration_consul_tls_cert_file: "{{ vault_tls_cert_file }}"
-vault_service_registration_consul_tls_key_file: "{{ vault_tls_key_file }}"
-vault_service_registration_consul_tls_ca_file: "{{ vault_tls_ca_file }}"
-vault_service_registration_consul_tls_min_version: "{{ vault_tls_min_version }}"
-vault_service_registration_consul_tls_skip_verify: false
-
 # Telemetry.
 vault_telemetry_enabled: true
 vault_telemetry_disable_hostname: false
 vault_prometheus_retention_time: 30s
+
+# UI.
+vault_ui: true
 
 # TLS.
 validate_certs_during_api_reachable_check: true
