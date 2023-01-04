@@ -45,25 +45,25 @@ listener "tcp" {
 {% endif -%}
 
 {#
-  Select which storage backend you want generated and placed
-  in the vault configuration file.
+  Select which storage you want generated and placed in the vault
+  configuration file.
 #}
-{%- if vault_backend == 'consul' -%}
-    {% include vault_backend_consul with context %}
-{% elif vault_backend == 'etcd' -%}
-    {% include vault_backend_etcd with context %}
-{% elif vault_backend == 'file' -%}
-    {% include vault_backend_file with context %}
-{% elif vault_backend == 's3' -%}
-    {% include vault_backend_s3 with context %}
-{% elif vault_backend == 'dynamodb' -%}
-    {% include vault_backend_dynamodb with context %}
-{% elif vault_backend == 'mysql' -%}
-    {% include vault_backend_mysql with context %}
-{% elif vault_backend == 'gcs' -%}
-    {% include vault_backend_gcs with context %}
-{% elif vault_backend == 'raft' -%}
-    {% include vault_backend_raft with context %}
+{%- if vault_storage == 'consul' -%}
+    {% include vault_storage_consul with context %}
+{% elif vault_storage == 'etcd' -%}
+    {% include vault_storage_etcd with context %}
+{% elif vault_storage == 'file' -%}
+    {% include vault_storage_file with context %}
+{% elif vault_storage == 's3' -%}
+    {% include vault_storage_s3 with context %}
+{% elif vault_storage == 'dynamodb' -%}
+    {% include vault_storage_dynamodb with context %}
+{% elif vault_storage == 'mysql' -%}
+    {% include vault_storage_mysql with context %}
+{% elif vault_storage == 'gcs' -%}
+    {% include vault_storage_gcs with context %}
+{% elif vault_storage == 'raft' -%}
+    {% include vault_storage_raft with context %}
 {% endif %}
 
 {% if vault_service_registration_consul_enable -%}
