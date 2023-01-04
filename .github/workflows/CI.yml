@@ -27,12 +27,12 @@ jobs:
           - "ubuntu-22.10"
     steps:
       - name: "Check out the codebase."
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v2.6.0"
         with:
           path: "pmikus.vault"
 
       - name: "Set up Python 3."
-        uses: "actions/setup-python@v2"
+        uses: "actions/setup-python@v4.4.0"
         with:
           python-version: "3.x"
 
@@ -51,7 +51,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out the codebase."
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v2.6.0"
         with:
           path: "pmikus.vault"
 

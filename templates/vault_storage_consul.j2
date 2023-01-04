@@ -1,0 +1,61 @@
+storage "consul" {
+    # Specifies the address of the Consul agent to communicate with. This can
+    # be an IP address, DNS record, or unix socket. It is recommended that you
+    # communicate with a local Consul agent; do not communicate directly with a
+    # server.
+    address = "{{ vault_storage_consul_address }}"
+    # Specifies the check interval used to send health check information back
+    # to Consul.
+    check_timeout = "{{ vault_storage_consul_check_timeout }}"
+    # Specifies the Consul consistency mode. Possible values are "default" or
+    # "strong".
+    consistency_mode = "{{ vault_storage_consul_consistency_mode }}"
+    # Specifies whether Vault should register itself with Consul.
+    disable_registration = "{{ vault_storage_consul_disable_registration | bool | lower }}"
+    # Specifies the maximum number of concurrent requests to Consul. Make sure
+    # that your Consul agents are configured to support this level of
+    # parallelism, see http_max_conns_per_client.
+    max_parallel = "{{ vault_storage_consul_max_parallel }}"
+    # Specifies the path in Consul's key-value store where Vault data will be
+    # stored.
+    path = "{{ vault_storage_consul_path }}"
+    # Specifies the scheme to use when communicating with Consul. This can be
+    # set to "http" or "https". It is highly recommended you communicate with
+    # Consul over https over non-local connections. When communicating over a
+    # unix socket, this option is ignored.
+    scheme = "{{ vault_storage_consul_scheme }}"
+    # Specifies the name of the service to register in Consul.
+    service = "{{ vault_storage_consul_service }}"
+    # Specifies a comma-separated list of tags to attach to the service
+    # registration in Consul.
+    service_tags: "{{ vault_storage_consul_service_tags }}"
+    # Specifies the Consul ACL token with permission to read and write from the
+    # path in Consul's key-value store. This is not a Vault token.
+    {% if vault_storage_consul_token is defined and vault_storage_consul_token -%}
+    token = "{{ vault_storage_consul_token }}"
+    {% endif -%}
+    # Specifies the minimum allowed session TTL. Consul server has a lower
+    # limit of 10s on the session TTL by default. The value of session_ttl
+    # here cannot be lesser than 10s unless the session_ttl_min on the consul
+    # server's configuration has a lesser value.
+    session_ttl = "{{ vault_storage_consul_session_ttl }}"
+    # Specifies the wait time before a lock acquisition is made. This affects
+    # the minimum time it takes to cancel a lock acquisition.
+    lock_wait_time = "{{ vault_storage_consul_lock_wait_time }}"
+    {% if vault_storage_consul_tls | bool -%}
+    # Specifies the path to the CA certificate used for Consul communication.
+    # This defaults to system bundle if not specified. This should be set
+    # according to the ca_file setting in Consul.
+    tls_ca_file = "{{ vault_storage_consul_tls_ca_file }}"
+    # Specifies the path to the certificate for Consul communication. This
+    # should be set according to the cert_file setting in Consul.
+    tls_cert_file = "{{ vault_storage_consul_tls_cert_file }}"
+    # Specifies the path to the private key for Consul communication. This
+    # should be set according to the key_file setting in Consul.
+    tls_key_file = "{{ vault_storage_consul_tls_key_file }}"
+    # Disable verification of TLS certificates. Using this option is highly
+    # discouraged.
+    tls_skip_verify = "{{ vault_storage_consul_tls_skip_verify | bool | lower }}"
+    {% endif %}
+
+}

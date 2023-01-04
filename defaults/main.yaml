@@ -63,6 +63,12 @@ vault_listener_localhost_enable: false
 vault_http_proxy: ""
 vault_https_proxy: ""
 vault_no_proxy: ""
+vault_cluster_disable: false
+vault_cluster_address: "{{ hostvars[inventory_hostname]['ansible_' + vault_iface]['ipv4']['address'] }}:{{ (vault_port | int) + 1 }}"
+vault_cluster_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
+vault_api_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
+vault_max_lease_ttl: "768h"
+vault_default_lease_ttl: "768h"
 
 # Conf - Listeners
 vault_tcp_listeners:
@@ -81,38 +87,36 @@ vault_tcp_listeners:
     vault_tls_disable_client_certs: "{{ vault_tls_disable_client_certs }}"
     vault_disable_mlock: true
 
-# Conf - Backend
-vault_backend_consul: "vault_backend_consul.j2"
-vault_backend_file: "vault_backend_file.j2"
-vault_backend_raft: "vault_backend_raft.j2"
-vault_backend_etcd: "vault_backend_etcd.j2"
-vault_backend_s3: "vault_backend_s3.j2"
-vault_backend_dynamodb: "vault_backend_dynamodb.j2"
-vault_backend_mysql: "vault_backend_mysql.j2"
-vault_backend_gcs: "vault_backend_gcs.j2"
+# Storage.
+vault_storage: "consul"
+vault_storage_consul: "vault_storage_consul.j2"
+vault_storage_file: "vault_storage_file.j2"
+vault_storage_raft: "vault_storage_raft.j2"
+vault_storage_etcd: "vault_storage_etcd.j2"
+vault_storage_s3: "vault_storage_s3.j2"
+vault_storage_dynamodb: "vault_storage_dynamodb.j2"
+vault_storage_mysql: "vault_storage_mysql.j2"
+vault_storage_gcs: "vault_storage_gcs.j2"
+# Storage - Consul.
+vault_storage_consul_address: "127.0.0.1:8500"
+vault_storage_consul_check_timeout: "5s"
+vault_storage_consul_consistency_mode: "default"
+vault_storage_consul_disable_registration: false
+vault_storage_consul_max_parallel: "128"
+vault_storage_consul_path: "vault"
+vault_storage_consul_scheme: "http"
+vault_storage_consul_service: "vault"
+vault_storage_consul_service_tags: ""
+# vault_storage_consul_token: ""
+vault_storage_consul_session_ttl: "15s"
+vault_storage_consul_lock_wait_time: "15s"
+vault_storage_consul_tls: false
+vault_storage_consul_tls_ca_file: "/etc/consul.d/ssl/ca.pem"
+vault_storage_consul_tls_cert_file: "/etc/consul.d/ssl/cert.pem"
+vault_storage_consul_tls_key_file: "/etc/consul.d/ssl/key.pem"
+vault_storage_consul_tls_skip_verify: false
 
-vault_cluster_disable: false
-vault_cluster_address: "{{ hostvars[inventory_hostname]['ansible_' + vault_iface]['ipv4']['address'] }}:{{ (vault_port | int) + 1 }}"
-vault_cluster_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
-vault_api_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
-
-vault_max_lease_ttl: "768h"
-vault_default_lease_ttl: "768h"
-
-vault_backend_tls_src_files: "{{ vault_tls_src_files }}"
-vault_backend_tls_config_path: "{{ vault_tls_config_path }}"
-vault_backend_tls_cert_file: "{{ vault_tls_cert_file }}"
-vault_backend_tls_key_file: "{{ vault_tls_key_file }}"
-vault_backend_tls_ca_file: "{{ vault_tls_ca_file }}"
-
-vault_consul: "127.0.0.1:8500"
-vault_consul_path: "vault"
-vault_consul_service: "vault"
-vault_consul_scheme: "http"
-
-vault_backend: "consul"
-
-# Conf - Service registration
+# Service registration.
 vault_service_registration_consul_enable: true
 vault_service_registration_consul_template: "vault_service_registration_consul.hcl.j2"
 vault_service_registration_consul_check_timeout: "5s"
@@ -130,26 +134,22 @@ vault_service_registration_consul_tls_ca_file: "{{ vault_tls_ca_file }}"
 vault_service_registration_consul_tls_min_version: "{{ vault_tls_min_version }}"
 vault_service_registration_consul_tls_skip_verify: false
 
-# Conf - Telemetry
+# Telemetry.
 vault_telemetry_enabled: true
 vault_telemetry_disable_hostname: false
 vault_prometheus_retention_time: 30s
 
-# Conf - TLS
+# TLS.
 validate_certs_during_api_reachable_check: true
-
 vault_tls_config_path: "/etc/vault/tls"
 vault_tls_src_files: "{{ role_path }}/files"
-
 vault_tls_disable: 1
 vault_tls_gossip: 0
-
 vault_tls_copy_keys: true
 vault_protocol: "{% if vault_tls_disable %}http{% else %}https{% endif %}"
 vault_tls_cert_file: "server.crt"
 vault_tls_key_file: "server.key"
 vault_tls_ca_file: "ca.crt"
-
 vault_tls_min_version: "tls12"
 vault_tls_cipher_suites: ""
 vault_tls_prefer_server_cipher_suites: false
