@@ -25,14 +25,13 @@ vault_architecture_map:
   32-bit: "386"
   64-bit: "amd64"
 vault_architecture: "{{ vault_architecture_map[ansible_architecture] }}"
-vault_os: "{{ ansible_system|lower }}"
+vault_os: "{{ ansible_system | lower }}"
 vault_pkg: "vault_{{ vault_version }}_{{ vault_os }}_{{ vault_architecture }}.zip"
 vault_zip_url: "https://releases.hashicorp.com/vault/{{ vault_version }}/{{ vault_pkg }}"
 vault_force_update: false
 
 # Conf - Service.
 vault_node_role: "server"
-vault_restart_handler_state: "restarted"
 vault_systemd_service_name: "vault"
 vault_service_mgr: ""
 
@@ -46,9 +45,7 @@ vault_ssl_dir: "/etc/vault.d/ssl"
 
 # Conf - User and group.
 vault_group: "vault"
-vault_group_state: "present"
 vault_user: "vault"
-vault_user_state: "present"
 
 # Conf - Main
 vault_group_name: "vault_instances"
@@ -56,7 +53,7 @@ vault_cluster_name: "yul1"
 vault_datacenter: "yul1"
 vault_log_level: "info"
 vault_iface: "{{ ansible_default_ipv4.interface }}"
-vault_address: "{{ hostvars[inventory_hostname]['ansible_'+vault_iface]['ipv4']['address'] }}"
+vault_address: "{{ hostvars[inventory_hostname]['ansible_' + vault_iface]['ipv4']['address'] }}"
 vault_ui: true
 vault_port: 8200
 vault_use_config_path: false
@@ -95,7 +92,7 @@ vault_backend_mysql: "vault_backend_mysql.j2"
 vault_backend_gcs: "vault_backend_gcs.j2"
 
 vault_cluster_disable: false
-vault_cluster_address: "{{ hostvars[inventory_hostname]['ansible_'+vault_iface]['ipv4']['address'] }}:{{ (vault_port | int) + 1 }}"
+vault_cluster_address: "{{ hostvars[inventory_hostname]['ansible_' + vault_iface]['ipv4']['address'] }}:{{ (vault_port | int) + 1 }}"
 vault_cluster_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
 vault_api_addr: "{{ vault_protocol }}://{{ vault_cluster_address }}"
 

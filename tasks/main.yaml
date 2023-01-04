@@ -13,14 +13,14 @@
 - name: Inst - Dependencies
   ansible.builtin.package:
     name: "{{ packages | flatten(levels=1) }}"
-    state: "latest"
+    state: "present"
   tags:
     - vault-inst-prerequisites
 
 - name: Conf - Add Vault Group
   ansible.builtin.group:
     name: "{{ vault_group }}"
-    state: "{{ vault_user_state }}"
+    state: "present"
   tags:
     - vault-conf-user
 
@@ -28,7 +28,7 @@
   ansible.builtin.user:
     name: "{{ vault_user }}"
     group: "{{ vault_group }}"
-    state: "{{ vault_group_state }}"
+    state: "present"
     system: true
   tags:
     - vault-conf-user
@@ -37,6 +37,7 @@
   ansible.builtin.get_url:
     url: "{{ vault_zip_url }}"
     dest: "{{ vault_inst_dir }}/{{ vault_pkg }}"
+    mode: 0644
   tags:
     - vault-inst-package
 

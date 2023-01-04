@@ -6,4 +6,4 @@
     daemon_reload: true
     enabled: true
     name: "vault"
-    state: "{{ vault_restart_handler_state }}"
+    state: "restarted"
