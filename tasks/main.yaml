@@ -100,8 +100,8 @@
 
 - name: Conf - Vault Main Configuration
   ansible.builtin.template:
-    src: "{{ vault_main_configuration_template }}"
-    dest: "{{ vault_main_config }}"
+    src: "vault_main.hcl.j2"
+    dest: "{{ vault_config_dir }}/vault_main.hcl"
     owner: "{{ vault_user }}"
     group: "{{ vault_group }}"
     mode: 0400

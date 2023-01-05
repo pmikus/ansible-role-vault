@@ -1,0 +1,121 @@
+# Specifies the identifier for the Vault cluster. If omitted, Vault will
+# generate a value. When connecting to Vault Enterprise, this value will be
+# used in the interface.
+cluster_name = "{{ vault_cluster_name }}"
+# Specifies the log level to use; overridden by CLI and env var parameters. On
+# SIGHUP (sudo kill -s HUP pid of vault), Vault will update the log level to
+# the current value specified here (including overriding the CLI/env var
+# parameters). Not all parts of Vault's logging can have its level be changed
+# dynamically this way; in particular, secrets/auth plugins are currently not
+# updated dynamically. Supported log levels: Trace, Debug, Error, Warn, Info.
+log_level = "{{ vault_log_level }}"
+# Specifies the default lease duration for tokens and secrets. This is specified
+# using a label suffix like "30s" or "1h". This value cannot be larger than
+# max_lease_ttl.
+default_lease_ttl = "{{ vault_default_lease_ttl }}"
+# pecifies the maximum possible lease duration for tokens and secrets. This is
+# specified using a label suffix like "30s" or "1h". Individual mounts can
+# override this value by tuning the mount with the max-lease-ttl flag of the
+# auth or secret commands.
+max_lease_ttl = "{{ vault_max_lease_ttl }}"
+
+# Specifies the address (full URL) to advertise to other Vault servers in the
+# cluster for client redirection. This value is also used for plugin backends.
+# This can also be provided via the environment variable VAULT_API_ADDR. In
+# general this should be set as a full URL that points to the value of the
+# listener address. This can be dynamically defined with a go-sockaddr template
+# that is resolved at runtime.
+api_addr = "{{ vault_api_addr }}"
+# Specifies the address to advertise to other Vault servers in the cluster for
+# request forwarding. This can also be provided via the environment variable
+# VAULT_CLUSTER_ADDR. This is a full URL, like api_addr, but Vault will ignore
+# the scheme (all cluster members always use TLS with a private
+# key/certificate). This can be dynamically defined with a go-sockaddr template
+# that is resolved at runtime.
+cluster_addr = "{{ vault_cluster_addr }}"
+# Specifies whether clustering features such as request forwarding are enabled.
+# Setting this to true on one Vault node will disable these features only when
+# that node is the active node. This parameter cannot be set to true if raft is
+# the storage type.
+disable_clustering = "{{ vault_disable_clustering | bool | lower }}"
+
+{% for l in vault_listener_tcp %}
+listener "tcp" {
+    # Specifies the address to bind to for listening. This can be dynamically
+    # defined with a go-sockaddr template that is resolved at runtime.
+    address = "{{ l.vault_address }}"
+    # Specifies the address to bind to for cluster server-to-server requests.
+    # This defaults to one port higher than the value of address. This does not
+    # usually need to be set, but can be useful in case Vault servers are
+    # isolated from each other in such a way that they need to hop through a
+    # TCP load balancer or some other scheme in order to talk. This can be
+    # dynamically defined with a go-sockaddr template that is resolved at
+    # runtime.
+    cluster_address = "{{ l.vault_cluster_address }}"
+    {% if not (l.vault_tls_disable | bool) -%}
+    tls_cert_file = "{{ l.vault_tls_config_path }}/{{ l.vault_tls_cert_file }}"
+    tls_key_file = "{{ l.vault_tls_config_path }}/{{ l.vault_tls_key_file }}"
+    tls_client_ca_file="{{ l.vault_tls_config_path }}/{{ l.vault_tls_ca_file }}"
+    tls_min_version  = "{{ l.vault_tls_min_version }}"
+    {% if vault_tls_cipher_suites is defined and vault_tls_cipher_suites -%}
+    tls_cipher_suites = "{{ l.vault_tls_cipher_suites}}"
+    {% endif -%}
+    tls_prefer_server_cipher_suites = "{{ l.vault_tls_prefer_server_cipher_suites }}"
+    {% if (l.vault_tls_require_and_verify_client_cert | bool) -%}
+    tls_require_and_verify_client_cert = "{{ l.vault_tls_require_and_verify_client_cert | bool | lower}}"
+    {% endif -%}
+    {% if (l.vault_tls_disable_client_certs | bool) -%}
+    tls_disable_client_certs = "{{ l.vault_tls_disable_client_certs | bool | lower}}"
+    {% endif -%}
+    {% endif -%}
+    tls_disable = "{{ l.vault_tls_disable | bool | lower }}"
+}
+{% endfor %}
+
+{#
+  Select which storage you want generated and placed in the vault
+  configuration file.
+#}
+{%- if vault_storage == 'consul' -%}
+    {% include vault_storage_consul with context %}
+{% elif vault_storage == 'etcd' -%}
+    {% include vault_storage_etcd with context %}
+{% elif vault_storage == 'file' -%}
+    {% include vault_storage_file with context %}
+{% elif vault_storage == 's3' -%}
+    {% include vault_storage_s3 with context %}
+{% elif vault_storage == 'dynamodb' -%}
+    {% include vault_storage_dynamodb with context %}
+{% elif vault_storage == 'mysql' -%}
+    {% include vault_storage_mysql with context %}
+{% elif vault_storage == 'gcs' -%}
+    {% include vault_storage_gcs with context %}
+{% elif vault_storage == 'raft' -%}
+    {% include vault_storage_raft with context %}
+{% endif %}
+
+{% if vault_service_registration == 'consul' -%}
+    {% include vault_service_registration_consul with context %}
+{% endif %}
+
+{% if vault_telemetry_enabled | bool -%}
+telemetry {
+    {% if vault_statsite_address is defined -%}
+    statsite_address = "{{vault_statsite_address}}"
+    {% endif -%}
+    {% if vault_statsd_address is defined -%}
+    statsd_address = "{{vault_statsd_address}}"
+    {% endif -%}
+    {% if vault_prometheus_retention_time is defined -%}
+    prometheus_retention_time = "{{ vault_prometheus_retention_time }}"
+    {% endif -%}
+    {% if vault_telemetry_disable_hostname is defined -%}
+    disable_hostname = {{vault_telemetry_disable_hostname | bool | lower }}
+    {% endif %}
+
+}
+{% endif %}
+
+{% if vault_ui %}
+ui = {{ vault_ui | bool | lower }}
+{% endif %}
