@@ -1,20 +1,63 @@
 service_registration "consul" {
+    # Specifies the address of the Consul agent to communicate with. This can
+    # be an IP address, DNS record, or unix socket. It is recommended that you
+    # communicate with a local Consul agent; do not communicate directly with a
+    # server.
     address = "{{ vault_service_registration_consul_address }}"
+
+    # Specifies the check interval used to send health check information back
+    # to Consul. This is specified using a label suffix like "30s" or "1h".
     check_timeout = "{{ vault_service_registration_consul_check_timeout }}"
+
+    # Specifies whether Vault should register itself with Consul.
     disable_registration = "{{ vault_service_registration_consul_disable_registration | bool | lower }}"
+
+    # Specifies the scheme to use when communicating with Consul. This can be
+    # set to "http" or "https". It is highly recommended you communicate with
+    # Consul over https over non-local connections. When communicating over a
+    # unix socket, this option is ignored.
     scheme = "{{ vault_service_registration_consul_scheme }}"
+
+    # Specifies the name of the service to register in Consul.
     service = "{{ vault_service_registration_consul_service }}"
+
+    # Specifies a comma-separated list of tags to attach to the service
+    # registration in Consul.
     service_tags = "{{ vault_service_registration_consul_service_tags }}"
+
     {% if vault_service_registration_consul_service_address is defined and vault_service_registration_consul_service_address -%}
+    # Specifies a service-specific address to set on the service registration
+    # in Consul. If unset, Vault will use what it knows to be the HA redirect
+    # address - which is usually desirable. Setting this parameter to "" will
+    # tell Consul to leverage the configuration of the node the service is
+    # registered on dynamically. This could be beneficial if you intend to
+    # leverage Consul's translate_wan_addrs parameter.
     service_address = "{{ vault_service_registration_consul_service_address }}"
     {% endif -%}
+
     {% if vault_service_registration_consul_token is defined and vault_service_registration_consul_token -%}
+    #  Specifies the Consul ACL token with permission to register the Vault
+    # service into Consul's service catalog. This is not a Vault token. See the
+    # ACL section below for help.
     token = "{{ vault_service_registration_consul_token }}"
     {% endif -%}
+
     {% if vault_service_registration_consul_scheme == "https" -%}
+    # Specifies the path to the CA certificate used for Consul communication.
+    # This defaults to system bundle if not specified. This should be set
+    # according to the ca_file setting in Consul.
     tls_ca_file = "{{ vault_service_registration_consul_tls_ca_file }}"
+
+    # Specifies the path to the certificate for Consul communication. This
+    # should be set according to the cert_file setting in Consul.
     tls_cert_file = "{{ vault_service_registration_consul_tls_cert_file }}"
+
+    # Specifies the path to the private key for Consul communication. This
+    # should be set according to the key_file setting in Consul.
     tls_key_file = "{{ vault_service_registration_consul_tls_key_file }}"
+
+    # Disable verification of TLS certificates. Using this option is highly
+    # discouraged.
     tls_skip_verify = "{{ vault_service_registration_consul_tls_skip_verify }}"
     {% endif %}
 

@@ -2,6 +2,7 @@
 # generate a value. When connecting to Vault Enterprise, this value will be
 # used in the interface.
 cluster_name = "{{ vault_cluster_name }}"
+
 # Specifies the log level to use; overridden by CLI and env var parameters. On
 # SIGHUP (sudo kill -s HUP pid of vault), Vault will update the log level to
 # the current value specified here (including overriding the CLI/env var
@@ -9,10 +10,12 @@ cluster_name = "{{ vault_cluster_name }}"
 # dynamically this way; in particular, secrets/auth plugins are currently not
 # updated dynamically. Supported log levels: Trace, Debug, Error, Warn, Info.
 log_level = "{{ vault_log_level }}"
+
 # Specifies the default lease duration for tokens and secrets. This is specified
 # using a label suffix like "30s" or "1h". This value cannot be larger than
 # max_lease_ttl.
 default_lease_ttl = "{{ vault_default_lease_ttl }}"
+
 # pecifies the maximum possible lease duration for tokens and secrets. This is
 # specified using a label suffix like "30s" or "1h". Individual mounts can
 # override this value by tuning the mount with the max-lease-ttl flag of the
@@ -26,6 +29,7 @@ max_lease_ttl = "{{ vault_max_lease_ttl }}"
 # listener address. This can be dynamically defined with a go-sockaddr template
 # that is resolved at runtime.
 api_addr = "{{ vault_api_addr }}"
+
 # Specifies the address to advertise to other Vault servers in the cluster for
 # request forwarding. This can also be provided via the environment variable
 # VAULT_CLUSTER_ADDR. This is a full URL, like api_addr, but Vault will ignore
@@ -33,17 +37,19 @@ api_addr = "{{ vault_api_addr }}"
 # key/certificate). This can be dynamically defined with a go-sockaddr template
 # that is resolved at runtime.
 cluster_addr = "{{ vault_cluster_addr }}"
+
 # Specifies whether clustering features such as request forwarding are enabled.
 # Setting this to true on one Vault node will disable these features only when
 # that node is the active node. This parameter cannot be set to true if raft is
 # the storage type.
-disable_clustering = "{{ vault_disable_clustering | bool | lower }}"
+disable_clustering = {{ vault_disable_clustering | bool | lower }}
 
 {% for l in vault_listener_tcp %}
 listener "tcp" {
     # Specifies the address to bind to for listening. This can be dynamically
     # defined with a go-sockaddr template that is resolved at runtime.
     address = "{{ l.vault_address }}"
+
     # Specifies the address to bind to for cluster server-to-server requests.
     # This defaults to one port higher than the value of address. This does not
     # usually need to be set, but can be useful in case Vault servers are
@@ -52,22 +58,47 @@ listener "tcp" {
     # dynamically defined with a go-sockaddr template that is resolved at
     # runtime.
     cluster_address = "{{ l.vault_cluster_address }}"
+
     {% if not (l.vault_tls_disable | bool) -%}
+    # Specifies the path to the certificate for TLS. It requires a PEM-encoded
+    # file. To configure the listener to use a CA certificate, concatenate the
+    # primary certificate and the CA certificate together. The primary
+    # certificate should appear first in the combined file. On SIGHUP, the path
+    # set here at Vault startup will be used for reloading the certificate;
+    # modifying this value while Vault is running will have no effect for
+    # SIGHUPs.
     tls_cert_file = "{{ l.vault_tls_config_path }}/{{ l.vault_tls_cert_file }}"
+
+    # Specifies the path to the private key for the certificate. It requires a
+    # PEM-encoded file. If the key file is encrypted, you will be prompted to
+    # enter the passphrase on server startup. The passphrase must stay the same
+    # between key files when reloading your configuration using SIGHUP. On
+    # SIGHUP, the path set here at Vault startup will be used for reloading the
+    # certificate; modifying this value while Vault is running will have no
+    # effect for SIGHUPs.
     tls_key_file = "{{ l.vault_tls_config_path }}/{{ l.vault_tls_key_file }}"
+
+    # PEM-encoded Certificate Authority file used for checking the authenticity
+    # of client.
     tls_client_ca_file="{{ l.vault_tls_config_path }}/{{ l.vault_tls_ca_file }}"
-    tls_min_version  = "{{ l.vault_tls_min_version }}"
-    {% if vault_tls_cipher_suites is defined and vault_tls_cipher_suites -%}
-    tls_cipher_suites = "{{ l.vault_tls_cipher_suites}}"
-    {% endif -%}
-    tls_prefer_server_cipher_suites = "{{ l.vault_tls_prefer_server_cipher_suites }}"
+
     {% if (l.vault_tls_require_and_verify_client_cert | bool) -%}
+    # Turns on client authentication for this listener; the listener will
+    # require a presented client cert that successfully validates against
+    # system CAs.
     tls_require_and_verify_client_cert = "{{ l.vault_tls_require_and_verify_client_cert | bool | lower}}"
     {% endif -%}
+
     {% if (l.vault_tls_disable_client_certs | bool) -%}
+    # Turns off client authentication for this listener. The default behavior
+    # (when this is false) is for Vault to request client certificates when
+    # available.
     tls_disable_client_certs = "{{ l.vault_tls_disable_client_certs | bool | lower}}"
     {% endif -%}
     {% endif -%}
+
+    # Specifies if TLS will be disabled. Vault assumes TLS by default, so you
+    # must explicitly disable TLS to opt-in to insecure communication.
     tls_disable = "{{ l.vault_tls_disable | bool | lower }}"
 }
 {% endfor %}
@@ -101,15 +132,24 @@ listener "tcp" {
 {% if vault_telemetry_enabled | bool -%}
 telemetry {
     {% if vault_statsite_address is defined -%}
+    # Specifies the address of a statsite server to forward metrics data to.
     statsite_address = "{{vault_statsite_address}}"
     {% endif -%}
+
     {% if vault_statsd_address is defined -%}
+    # Specifies the address of a statsd server to forward metrics to.
     statsd_address = "{{vault_statsd_address}}"
     {% endif -%}
+
     {% if vault_prometheus_retention_time is defined -%}
+    # Specifies the amount of time that Prometheus metrics are retained in
+    # memory. Setting this to 0 will disable Prometheus telemetry.
     prometheus_retention_time = "{{ vault_prometheus_retention_time }}"
     {% endif -%}
+
     {% if vault_telemetry_disable_hostname is defined -%}
+    # It is recommended to also enable the option disable_hostname to avoid
+    # having prefixed metrics with hostname.
     disable_hostname = {{vault_telemetry_disable_hostname | bool | lower }}
     {% endif %}
 
@@ -117,5 +157,9 @@ telemetry {
 {% endif %}
 
 {% if vault_ui %}
+# Enables the built-in web UI, which is available on all listeners
+# (address + port) at the /ui path. Browsers accessing the standard Vault API
+# address will automatically redirect there. This can also be provided via the
+# environment variable VAULT_UI.
 ui = {{ vault_ui | bool | lower }}
 {% endif %}
