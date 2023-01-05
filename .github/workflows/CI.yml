@@ -56,7 +56,7 @@ jobs:
           path: "pmikus.vault"
 
       - name: "Set up Python 3."
-        uses: "actions/setup-python@v2"
+        uses: "actions/setup-python@v4.4.0"
         with:
           python-version: "3.x"
 
