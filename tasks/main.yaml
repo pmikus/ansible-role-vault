@@ -115,17 +115,17 @@
 
 - name: Copy Certificates And Keys
   ansible.builtin.copy:
-     content: "{{ item.src }}"
-     dest: "{{ item.dest }}"
-     owner: "{{ vault_user }}"
-     group: "{{ vault_group }}"
-     mode: 0600
+    content: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0600
   no_log: true
-  oop: "{{ vault_certificates | flatten(levels=1) }}"
+  loop: "{{ vault_certificates | flatten(levels=1) }}"
   when:
     - vault_certificates is defined
   tags:
-     - vault-conf
+    - vault-conf
 
 - name: System.d Script
   ansible.builtin.template:
