@@ -1,30 +1,33 @@
 ---
 # file: tasks/main.yaml
 
-- name: Inst - Update Package Cache (APT)
+- name: Update Repositories Cache
   ansible.builtin.apt:
     update_cache: true
-    cache_valid_time: 3600
   when:
     - ansible_os_family == 'Debian'
   tags:
-    - vault-inst-prerequisites
+    - vault-inst-package
 
-- name: Inst - Dependencies
-  ansible.builtin.package:
+- name: Dependencies
+  ansible.builtin.apt:
     name: "{{ packages | flatten(levels=1) }}"
     state: "present"
+    cache_valid_time: 3600
+    install_recommends: false
+  when:
+    - ansible_os_family == 'Debian'
   tags:
-    - vault-inst-prerequisites
+    - vault-inst-dependencies
 
-- name: Conf - Add Vault Group
+- name: Add Vault Group
   ansible.builtin.group:
     name: "{{ vault_group }}"
     state: "present"
   tags:
     - vault-conf-user
 
-- name: Conf - Add Vault User
+- name: Add Vault User
   ansible.builtin.user:
     name: "{{ vault_user }}"
     group: "{{ vault_group }}"
@@ -33,7 +36,7 @@
   tags:
     - vault-conf-user
 
-- name: Inst - Download Vault
+- name: Download Vault
   ansible.builtin.get_url:
     url: "{{ vault_zip_url }}"
     dest: "{{ vault_inst_dir }}/{{ vault_pkg }}"
@@ -41,7 +44,7 @@
   tags:
     - vault-inst-package
 
-- name: Inst - Clean Vault
+- name: Clean Vault
   ansible.builtin.file:
     path: "{{ vault_inst_dir }}/vault"
     state: "absent"
@@ -50,7 +53,7 @@
   tags:
     - vault-inst-package
 
-- name: Inst - Unarchive Vault
+- name: Unarchive Vault
   ansible.builtin.unarchive:
     src: "{{ vault_inst_dir }}/{{ vault_pkg }}"
     dest: "{{ vault_inst_dir }}/"
@@ -58,7 +61,7 @@
   tags:
     - vault-inst-package
 
-- name: Inst - Vault
+- name: Vault
   ansible.builtin.copy:
     src: "{{ vault_inst_dir }}/vault"
     dest: "{{ vault_bin_dir }}"
@@ -84,7 +87,7 @@
   tags:
     - vault-inst-package
 
-- name: Conf - Create Directories
+- name: Create Directories
   ansible.builtin.file:
     dest: "{{ item }}"
     state: "directory"
@@ -98,29 +101,33 @@
   tags:
     - vault-conf
 
-- name: Conf - Vault Main Configuration
+- name: Base Configuration
   ansible.builtin.template:
-    src: "vault_main.hcl.j2"
-    dest: "{{ vault_config_dir }}/vault_main.hcl"
+    src: "{{ item }}.hcl.j2"
+    dest: "{{ vault_config_dir }}/{{ item }}.hcl"
     owner: "{{ vault_user }}"
     group: "{{ vault_group }}"
     mode: 0400
+  with_items:
+    - "vault_main"
   tags:
     - vault-conf
 
-# - name: Conf - Copy Certificates And Keys
-#   copy:
-#     content: "{{ item.src }}"
-#     dest: "{{ item.dest }}"
-#     owner: "{{ vault_user }}"
-#     group: "{{ vault_group }}"
-#     mode: 0600
-#   no_log: true
-#   loop: "{{ vault_certificates | flatten(levels=1) }}"
-#   tags:
-#     - vault-conf
+- name: Copy Certificates And Keys
+  ansible.builtin.copy:
+     content: "{{ item.src }}"
+     dest: "{{ item.dest }}"
+     owner: "{{ vault_user }}"
+     group: "{{ vault_group }}"
+     mode: 0600
+   no_log: true
+   loop: "{{ vault_certificates | flatten(levels=1) }}"
+  when:
+    - vault_certificates is defined
+   tags:
+     - vault-conf
 
-- name: Conf - System.d Script
+- name: System.d Script
   ansible.builtin.template:
     src: "vault_systemd.service.j2"
     dest: "/lib/systemd/system/vault.service"
@@ -134,5 +141,5 @@
   tags:
     - vault-conf
 
-- name: Meta - Flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

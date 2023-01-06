@@ -87,16 +87,16 @@ listener "tcp" {
     # require a presented client cert that successfully validates against
     # system CAs.
     tls_require_and_verify_client_cert = "{{ l.vault_tls_require_and_verify_client_cert | bool | lower}}"
-    {% endif -%}
 
+    {% endif -%}
     {% if (l.vault_tls_disable_client_certs | bool) -%}
     # Turns off client authentication for this listener. The default behavior
     # (when this is false) is for Vault to request client certificates when
     # available.
     tls_disable_client_certs = "{{ l.vault_tls_disable_client_certs | bool | lower}}"
-    {% endif -%}
-    {% endif -%}
 
+    {% endif -%}
+    {% endif -%}
     # Specifies if TLS will be disabled. Vault assumes TLS by default, so you
     # must explicitly disable TLS to opt-in to insecure communication.
     tls_disable = "{{ l.vault_tls_disable | bool | lower }}"
@@ -134,25 +134,25 @@ telemetry {
     {% if vault_statsite_address is defined -%}
     # Specifies the address of a statsite server to forward metrics data to.
     statsite_address = "{{vault_statsite_address}}"
-    {% endif -%}
 
+    {% endif -%}
     {% if vault_statsd_address is defined -%}
     # Specifies the address of a statsd server to forward metrics to.
     statsd_address = "{{vault_statsd_address}}"
-    {% endif -%}
 
+    {% endif -%}
     {% if vault_prometheus_retention_time is defined -%}
     # Specifies the amount of time that Prometheus metrics are retained in
     # memory. Setting this to 0 will disable Prometheus telemetry.
     prometheus_retention_time = "{{ vault_prometheus_retention_time }}"
-    {% endif -%}
 
+    {% endif -%}
     {% if vault_telemetry_disable_hostname is defined -%}
     # It is recommended to also enable the option disable_hostname to avoid
     # having prefixed metrics with hostname.
     disable_hostname = {{vault_telemetry_disable_hostname | bool | lower }}
-    {% endif %}
 
+    {% endif %}
 }
 {% endif %}
 
