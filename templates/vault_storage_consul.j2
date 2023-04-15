@@ -35,7 +35,7 @@ storage "consul" {
 
     # Specifies a comma-separated list of tags to attach to the service
     # registration in Consul.
-    service_tags: "{{ vault_storage_consul_service_tags }}"
+    service_tags = "{{ vault_storage_consul_service_tags }}"
     {% if vault_storage_consul_token is defined and vault_storage_consul_token -%}
     # Specifies the Consul ACL token with permission to read and write from the
     # path in Consul's key-value store. This is not a Vault token.

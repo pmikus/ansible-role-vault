@@ -73,7 +73,7 @@
   tags:
     - vault-inst-package
 
-- name: Inst - Check Vault mlock Capability
+- name: Check Vault mlock Capability
   ansible.builtin.command: "setcap cap_ipc_lock=+ep {{ vault_bin_dir }}/vault"
   changed_when: false  # read-only task
   ignore_errors: true
@@ -81,7 +81,7 @@
   tags:
     - vault-inst-package
 
-- name: Inst - Enable non root mlock Capability
+- name: Enable Non Root Mlock Capability
   ansible.builtin.command: "setcap cap_ipc_lock=+ep {{ vault_bin_dir }}/vault"
   when: vault_mlock_capability is failed
   tags:

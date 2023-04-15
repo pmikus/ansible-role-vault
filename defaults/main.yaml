@@ -112,7 +112,7 @@ vault_storage_consul_check_timeout: "5s"
 vault_storage_consul_consistency_mode: "default"
 vault_storage_consul_disable_registration: false
 vault_storage_consul_max_parallel: "128"
-vault_storage_consul_path: "vault"
+vault_storage_consul_path: "vault/"
 vault_storage_consul_scheme: "http"
 vault_storage_consul_service: "vault"
 vault_storage_consul_service_tags: ""
