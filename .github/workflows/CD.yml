@@ -50,6 +50,6 @@ jobs:
 
     steps:
       - name: "Ansible Galaxy Role Importer"
-        uses: "ansible/ansible-publish-action@v1.0.0"
+        uses: "hspaans/ansible-galaxy-action@v0.2.8"
         with:
           api_key: "${{ secrets.GALAXY_TOKEN }}"
